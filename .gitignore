@@ -67,4 +67,5 @@ pythonenv*
 /lldb/docs/python_api/
 
 /artifacts
+/.dotnet
 /.packages
