@@ -50,6 +50,13 @@ void DwarfInfo::DumpTypes(UserDefinedDwarfTypesBuilder *TypeBuilder, MCObjectStr
   IsDumpedTypes = true;
 }
 
+void DwarfInfo::EndChildrenList(MCObjectStreamer* Streamer) {
+  if (HasChildren()) {
+    // Emit null entry
+    Streamer->emitIntValue(0, 1);
+  }
+}
+
 void DwarfInfo::EmitSectionOffset(MCObjectStreamer *Streamer,
                                   MCSymbol *Symbol,
                                   unsigned Size,
@@ -265,7 +272,7 @@ void DwarfEnumTypeInfo::Dump(UserDefinedDwarfTypesBuilder *TypeBuilder, MCObject
 
   // Terminate DIE
   Streamer->SwitchSection(TypeSection);
-  Streamer->emitIntValue(0, 1);
+  EndChildrenList(Streamer);
 }
 
 void DwarfEnumTypeInfo::DumpStrings(MCObjectStreamer *Streamer) {
@@ -413,7 +420,7 @@ void DwarfClassTypeInfo::Dump(UserDefinedDwarfTypesBuilder *TypeBuilder, MCObjec
 
   // Terminate DIE
   Streamer->SwitchSection(TypeSection);
-  Streamer->emitIntValue(0, 1);
+  DwarfInfo::EndChildrenList(Streamer);
 }
 
 void DwarfClassTypeInfo::DumpStrings(MCObjectStreamer *Streamer) {
@@ -423,7 +430,11 @@ void DwarfClassTypeInfo::DumpStrings(MCObjectStreamer *Streamer) {
 
 void DwarfClassTypeInfo::DumpTypeInfo(MCObjectStreamer *Streamer, UserDefinedDwarfTypesBuilder *TypeBuilder) {
   // Abbrev Number
-  Streamer->emitULEB128IntValue(IsForwardDecl ? DwarfAbbrev::ClassTypeDecl : DwarfAbbrev::ClassType);
+  auto abbrev = IsForwardDecl   ? DwarfAbbrev::ClassTypeDecl
+                : HasChildren() ? DwarfAbbrev::ClassType
+                                : DwarfAbbrev::ClassTypeNoChildren;
+
+  Streamer->emitULEB128IntValue(abbrev);
 
   // DW_AT_name
   EmitSectionOffset(Streamer, StrSymbol, 4);
@@ -448,6 +459,10 @@ void DwarfClassTypeInfo::DumpTypeInfo(MCObjectStreamer *Streamer, UserDefinedDwa
     // DW_AT_data_member_location = 0
     Streamer->emitIntValue(0, 1);
   }
+}
+
+bool DwarfClassTypeInfo::HasChildren() {
+  return BaseClassId != 0 || !Fields.empty() || !StaticFields.empty() || !MemberFunctions.empty();
 }
 
 // DwarfSimpleArrayTypeInfo
@@ -488,7 +503,7 @@ void DwarfSimpleArrayTypeInfo::DumpTypeInfo(MCObjectStreamer *Streamer, UserDefi
   Streamer->emitULEB128IntValue(Size - 1);
 
   // Terminate DIE
-  Streamer->emitIntValue(0, 1);
+  EndChildrenList(Streamer);
 }
 
 // DwarfPointerTypeInfo
@@ -803,7 +818,7 @@ unsigned UserDefinedDwarfTypesBuilder::GetPrimitiveTypeIndex(PrimitiveTypeFlags 
 
   if (Type == PrimitiveTypeFlags::Void)
     DwarfTypes.push_back(std::make_unique<DwarfVoidTypeInfo>());
-  else 
+  else
     DwarfTypes.push_back(std::make_unique<DwarfPrimitiveTypeInfo>(Type));
 
   PrimitiveDwarfTypes.insert(std::make_pair(Type, TypeIndex));

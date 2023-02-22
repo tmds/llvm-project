@@ -60,6 +60,7 @@ public:
 protected:
   void DumpStrings(MCObjectStreamer *Streamer) override {}
   void DumpTypeInfo(MCObjectStreamer *Streamer, UserDefinedDwarfTypesBuilder *TypeBuilder) override;
+  bool HasChildren() override;
 
 private:
   void DumpDebugLoc(MCObjectStreamer *Streamer, MCSection *LocSection);
