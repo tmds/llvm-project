@@ -465,6 +465,14 @@ int ObjectWriter::EmitSymbolRef(const char *SymbolName,
     Kind = MCSymbolRefExpr::VK_SECREL;
     Size = 4;
     break;
+  case RelocType::IMAGE_REL_TLSGD:
+    Kind = MCSymbolRefExpr::VK_TLSGD;
+    Size = 4;
+    break;
+  case RelocType::IMAGE_REL_TPOFF:
+    Kind = MCSymbolRefExpr::VK_TPOFF;
+    Size = 4;
+    break;
   case RelocType::IMAGE_REL_BASED_REL32:
     if (OutContext->getObjectFileType() == MCContext::IsMachO &&
         OutContext->getTargetTriple().getArch() == Triple::aarch64) {
