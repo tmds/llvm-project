@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <GitHubRepositoryName>llvm-project</GitHubRepositoryName>
-    <SourceBuildManagedOnly>true</SourceBuildManagedOnly>
   </PropertyGroup>
 
 </Project>
