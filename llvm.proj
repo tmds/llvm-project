@@ -41,6 +41,7 @@
     <_CMakeInstallCommand Condition="'$(BuildObjWriterOnly)' != 'true'">$(_SetupEnvironment) cmake -DCMAKE_INSTALL_DO_STRIP=1 -DCMAKE_INSTALL_PREFIX=$(_LLVMInstallDir) -P cmake_install.cmake</_CMakeInstallCommand>
     <_CrossBuild>false</_CrossBuild>
     <_CrossBuild Condition="'$(ClangTarget)' != ''">true</_CrossBuild>
+    <_CrossBuild Condition="'$(TargetArchitecture)' == 'arm64' and '$(BuildOS)' == 'Windows_NT'">true</_CrossBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(BuildOS)' != 'Windows_NT'">
@@ -57,7 +58,7 @@
     <_LLVMBuildArgs Condition="'$(TargetArchitecture)' == 'arm'" Include="-DLLVM_TARGET_ARCH=ARM" />
     <_LLVMBuildArgs Condition="'$(TargetArchitecture)' == 'x64'" Include="-DLLVM_TARGET_ARCH=X86_64" />
     <!-- Enable CMake cross-compilation support by setting CMAKE_SYSTEM_NAME manually, see https://github.com/llvm/llvm-project/issues/52819 -->
-    <_LLVMBuildArgs Condition="'$(TargetArchitecture)' == 'arm64' and '$(BuildOS)' == 'Windows_NT'" Include="-DCMAKE_SYSTEM_NAME=Windows" />
+    <_LLVMBuildArgs Condition="'$(BuildOS)' == 'Windows_NT'" Include="-DCMAKE_SYSTEM_NAME=Windows" />
     <_LLVMBuildArgs Condition="'$(BuildOS)' == 'Linux'" Include="-DCMAKE_SYSTEM_NAME=Linux" />
     <_LLVMBuildArgs Condition="'$(BuildOS)' == 'OSX'" Include="-DCMAKE_SYSTEM_NAME=Darwin" />
     <_LLVMBuildArgs Condition="'$(BuildOS)' == 'Linux'" Include='-DCROSS_TOOLCHAIN_FLAGS_LLVM_NATIVE="-DCMAKE_EXE_LINKER_FLAGS_INIT=-fuse-ld=lld;-DCMAKE_SHARED_LINKER_FLAGS_INIT=-fuse-ld=lld"' />
