@@ -41,7 +41,8 @@
     <_CMakeInstallCommand Condition="'$(BuildObjWriterOnly)' != 'true'">$(_SetupEnvironment) cmake -DCMAKE_INSTALL_DO_STRIP=1 -DCMAKE_INSTALL_PREFIX=$(_LLVMInstallDir) -P cmake_install.cmake</_CMakeInstallCommand>
     <_CrossBuild>false</_CrossBuild>
     <_CrossBuild Condition="'$(ClangTarget)' != ''">true</_CrossBuild>
-    <_CrossBuild Condition="'$(TargetArchitecture)' == 'arm64' and '$(BuildOS)' == 'Windows_NT'">true</_CrossBuild>
+    <_hostArch>$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString().ToLowerInvariant)</_hostArch>
+    <_CrossBuild Condition="'$(BuildOS)' == 'Windows_NT' and '$(TargetArchitecture)' != '$(_hostArch)'">true</_CrossBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(BuildOS)' != 'Windows_NT'">
