@@ -167,18 +167,22 @@
       <_LibCxxBuildArgs Include="-DLLVM_DEFAULT_TARGET_TRIPLE=$(ClangTarget)" />
       <_LibCxxBuildArgs Condition="$(ClangTarget.ToLowerInvariant().Contains('musl'))" Include="-DLIBCXX_HAS_MUSL_LIBC=ON" />
     </ItemGroup>
+    <PropertyGroup>
+      <_LibCxxBuildCommand Condition="'$(CMakeGenerator)' == 'Unix Makefiles'">$(_SetupEnvironment) make -j$([System.Environment]::ProcessorCount)</_LibCxxBuildCommand>
+      <_LibCxxBuildCommand Condition="'$(CMakeGenerator)' == 'Ninja'">$(_SetupEnvironment) ninja</_LibCxxBuildCommand>
+    </PropertyGroup>
     <Message Text="** Configuring bootstrap libc++ '$(_LibCxxConfigureCommand)'" Importance="High" />
     <Exec WorkingDirectory="$(_LibCxxBuildDir)"
           Command="$(_LibCxxConfigureCommand)"
           Condition="!Exists('$(_LibCxxBuildDir)/CMakeCache.txt')"
           IgnoreStandardErrorWarningFormat="true" />
-    <Message Text="** Building bootstrap libc++ '$(_BuildCommand)'" Importance="High" />
+    <Message Text="** Building bootstrap libc++ '$(_LibCxxBuildCommand)'" Importance="High" />
     <Exec WorkingDirectory="$(_LibCxxBuildDir)"
-          Command="$(_BuildCommand)"
+          Command="$(_LibCxxBuildCommand)"
           IgnoreStandardErrorWarningFormat="true" />
-    <Message Text="** Installing bootstrap libc++ '$(_CMakeInstallCommand)'" Importance="High" />
+    <Message Text="** Installing bootstrap libc++ '$(_LibCxxBuildCommand) install'" Importance="High" />
     <Exec WorkingDirectory="$(_LibCxxBuildDir)"
-          Command="$(_BuildCommand) install"
+          Command="$(_LibCxxBuildCommand) install"
           IgnoreStandardErrorWarningFormat="true" />
     <ItemGroup>
       <_LibCxxUnstripped Include="libc++.so.1.0" />
