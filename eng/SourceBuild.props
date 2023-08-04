@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <GitHubRepositoryName>llvm-project</GitHubRepositoryName>
-    <!-- we're not building all of llvm for now, just objwriter -->
-    <BuildObjWriterOnly>true</BuildObjWriterOnly>
   </PropertyGroup>
 
 </Project>

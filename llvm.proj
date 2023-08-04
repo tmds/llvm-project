@@ -3,6 +3,11 @@
   <Import Project="Directory.Build.targets" />
 
   <PropertyGroup>
+    <!-- we're not building all of llvm for now in source build, just objwriter -->
+    <BuildObjWriterOnly Condition="'$(BuildObjWriterOnly)' == '' and '$(DotNetBuildFromSource)' == 'true'">true</BuildObjWriterOnly>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <CMakeGenerator Condition="$(CMakeGenerator) == '' and '$(BuildOS)' != 'Windows_NT'">Unix Makefiles</CMakeGenerator>
     <CMakeGenerator Condition="$(CMakeGenerator) == '' and '$(BuildOS)' == 'Windows_NT'">Ninja</CMakeGenerator>
     <_VCVarsScriptName Condition="'$(BuildOS)' == 'Windows_NT'">vcvars64.bat</_VCVarsScriptName>
